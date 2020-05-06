@@ -1,9 +1,0 @@
-
-# Maven
-target/
-
-# Intellij
-*.iml
-*.iws
-*.idea/
-*.build/
