@@ -1,10 +1,13 @@
 package stepdefs;
 
+import pages.*;
 import com.codeborne.selenide.ElementsCollection;
 import cucumber.api.java.ru.И;
 import cucumber.api.java.ru.*;
 import org.openqa.selenium.By;
+import pages.AbstractPage;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -12,19 +15,39 @@ import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selenide.*;
 
+
 public class MyStepdefs {
+        MainPage mainPage = new MainPage();
+
         private String randomMessage;
-        @Пусть("я как пользователь открыла сайт")
-        public void openedSite() {
+        //MyStepdefs stepdefs = new MyStepdefs();
+//        @Пусть("я как пользователь открыла сайт")
+//        public void openedSite() {
+//                System.out.println("Открываем сайт для тестирования");
+//                open("https://dev.n7lanit.ru/");
+//        };
+
+        @Пусть("я как пользователь открыла {string}")
+        public void openedSite(String site) throws ClassNotFoundException {
                 System.out.println("Открываем сайт для тестирования");
-                open("https://dev.n7lanit.ru/");
+                open(AbstractPage.getUrlByTitle(site));
         };
+
         @И("открыла окно авторизации")
-        public void openedSignInWindow() {
+        public void openedSignInWindow() throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
                 System.out.println("Открываем окно авторизации");
-                $(byText("Войти")).shouldBe(visible).click();//найти элемент по тексту и проверить видимость, кликнуть
-                $(byText("Забыли пароль?")).shouldBe(visible);//найти элемент по тексту и проверить видимость
+                AbstractPage.getPageByTitle("главная страница").getElementByName("Войти")
+                .shouldBe(visible).click();//найти элемент по тексту и проверить видимость
+                AbstractPage.getPageByTitle("страница авторизации").getElementByName("Забыли пароль?")
+                .shouldBe(visible);//найти элемент по тексту и проверить видимость, кликнуть
         };
+//
+//        @И("открыла {string}")
+//        public void openedSignInWindow(String login) throws InvocationTargetException, IllegalAccessException {
+//                System.out.println("Открываем окно авторизации");
+//                mainPage.getElementByName(login).click();
+//        };
+
         @Затем("авторизовалась с {string} и {string}")
         public void signedIn(String login, String password) {
                 System.out.println("Авторизуемся с логином \"" + login + "\" и паролем \"" + password + "\".");
