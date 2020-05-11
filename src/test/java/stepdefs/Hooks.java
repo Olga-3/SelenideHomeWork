@@ -13,22 +13,22 @@ import java.util.concurrent.TimeUnit;
 public class Hooks {
     @Before
     public void before(){
-        System.setProperty("webdriver.chrome.driver", "C:\\Program Files\\chromedriver_win32\\Chromedriver.exe");
-        Configuration.timeout = 3000;
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--disable-save-password-bubble");
-        WebDriver driver = new ChromeDriver(options);
-        WebDriverRunner.setWebDriver(driver);
-        System.out.println("Начало теста");
-        driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-        driver.manage().timeouts().pageLoadTimeout(5, TimeUnit.SECONDS);
-        driver.manage().timeouts().setScriptTimeout(5, TimeUnit.SECONDS);
+//        System.setProperty("webdriver.chrome.driver", "C:\\Program Files\\chromedriver_win32\\Chromedriver.exe");
+//        Configuration.timeout = 3000;
+//        ChromeOptions options = new ChromeOptions();
+//        options.addArguments("--disable-save-password-bubble");
+//        WebDriver driver = new ChromeDriver(options);
+//        WebDriverRunner.setWebDriver(driver);
+//        System.out.println("Начало теста");
+//        driver.manage().window().maximize();
+//        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+//        driver.manage().timeouts().pageLoadTimeout(5, TimeUnit.SECONDS);
+//        driver.manage().timeouts().setScriptTimeout(5, TimeUnit.SECONDS);
 
     }
     @After
     public void after(){
-        WebDriverRunner.closeWebDriver();
-        System.out.println("Конец теста");
+//        WebDriverRunner.closeWebDriver();
+//        System.out.println("Конец теста");
     }
 }

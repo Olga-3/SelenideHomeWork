@@ -1,5 +1,6 @@
 package pages;
 
+import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.Selectors;
 import com.codeborne.selenide.SelenideElement;
@@ -16,8 +17,6 @@ import static com.codeborne.selenide.Selenide.$$;
 //тут адреса всех нужных элементов главной страницы (сюда ссылаются шаги в MyStepdefs)
 @Page(title = "главная страница", url = "https://dev.n7lanit.ru")
 public class MainPage extends AbstractPage {
-
-
 
     @Element("вкладка Темы")
     public WebElement getTopicsTab() {
@@ -48,18 +47,26 @@ public class MainPage extends AbstractPage {
 
     @Element("неактивна")
     public SelenideElement InactiveSubscription() throws InterruptedException {
-        ElementsCollection collection2 = $$(By.xpath("//*[text()='Неактивна']"));//найти вcе элементы определенного класса
+        ElementsCollection collection2 = $$(By.xpath("//*[text()='Неактивна']")).filter(Condition.visible);//найти вcе видимые элементы "Неактивна", добавить в коллекцию
         Thread.sleep(3000);
         return collection2.get((int) (collection2.size() * Math.random()));//взять элемент под случайным номером в коллекции
     }
     @Element("подписаться")
     public SelenideElement subscribe() {
-        //return $(By.xpath("//*[text()='Подписаться']"));//работает,вроде бы, но через раз
-        return $(By.xpath("//li[@class='btn-link')][text()='Подписаться']"));
+        return $(By.xpath("//*[text()='Подписаться']"));//работает,вроде бы, но через раз
+        //return $(By.xpath("//li[@class='btn-link')][text()='Подписаться']"));//вообще не работает, вроде бы
+       // return $(By.partialLinkText("Подписать"));//не работает
     }
     @Element("активна")
     public SelenideElement active() {
         return $(By.xpath("//*[text()='Активна']"));
     }
+
+    @Element("вкладка подписки")
+    public SelenideElement subscriptionsTab() {
+        return $(By.xpath(""));
+    }
+
+
 
 }
