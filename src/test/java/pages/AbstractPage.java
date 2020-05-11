@@ -28,6 +28,10 @@ public abstract class AbstractPage {
         throw new ClassNotFoundException("Окно с заголовком " + title + " не найдено в списке");
     }
 
+//    public static String getUrl(String url) {
+//        return url;
+//    }
+
     public static AbstractPage getPageByTitle(String title) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
         for (Class<? extends AbstractPage> clazz : CLASSES) {
             if (clazz.isAnnotationPresent(Page.class)) {

@@ -1,11 +1,15 @@
 package stepdefs;
 
+import com.codeborne.selenide.SelenideElement;
+import org.openqa.selenium.WebElement;
 import pages.*;
 import com.codeborne.selenide.ElementsCollection;
 import cucumber.api.java.ru.И;
 import cucumber.api.java.ru.*;
 import org.openqa.selenium.By;
 import pages.AbstractPage;
+import pages.annotations.Element;
+import pages.annotations.Page;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -14,79 +18,86 @@ import java.util.Random;
 import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selectors.*;
 import static com.codeborne.selenide.Selenide.*;
+import static com.codeborne.selenide.WebDriverRunner.url;
+import static org.junit.Assert.assertEquals;
 
 
 public class MyStepdefs {
-        MainPage mainPage = new MainPage();
 
-        private String randomMessage;
-        //MyStepdefs stepdefs = new MyStepdefs();
-//        @Пусть("я как пользователь открыла сайт")
-//        public void openedSite() {
-//                System.out.println("Открываем сайт для тестирования");
-//                open("https://dev.n7lanit.ru/");
-//        };
+        public static String topicUrl = ""; //сюда я присваиваю url случайно выбранной в шаге страницы, но
+        //но не получается использовать его в специально созданном классе SelectedTopicMessage
+        private String randomMessage;//этой переменной присваивается рандомно выбранное из array значение
+        private String topicName; //тут будет сохранен текст-название случайно выбранной темы для теста 1
+       // public String topicUrl;
 
+        @Element("Ответить")
+        public WebElement addMessage() {
+                return $(byCssSelector("[class=\"btn btn-primary btn-block btn-outline\"]"));//найти элемент Темы по xpath
+        }
+
+//адреса элементов описаны в классе AuthorizationWindow (элементы окна авторизации: поля для ввода логина и пароля и т.д.)
+//и в классе MainPage (элементы Войти, аватар, темы..)
         @Пусть("я как пользователь открыла {string}")
-        public void openedSite(String site) throws ClassNotFoundException {
+        public void openedSite(String mainPage) throws ClassNotFoundException {
                 System.out.println("Открываем сайт для тестирования");
-                open(AbstractPage.getUrlByTitle(site));
+                open(AbstractPage.getUrlByTitle(mainPage));
         };
 
-        @И("открыла окно авторизации")
-        public void openedSignInWindow() throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+        @И("на {string} открыла окно авторизации")//тут mainPage = "главная страница", это название связано с адресом в классе MainPage
+        public void openedSignInWindow(String mainPage) throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
                 System.out.println("Открываем окно авторизации");
-                AbstractPage.getPageByTitle("главная страница").getElementByName("Войти")
-                .shouldBe(visible).click();//найти элемент по тексту и проверить видимость
+                AbstractPage.getPageByTitle(mainPage).getElementByName("Войти")
+                .shouldBe(visible).click();//найти элемент по тексту и проверить видимость, кликнуть
                 AbstractPage.getPageByTitle("страница авторизации").getElementByName("Забыли пароль?")
-                .shouldBe(visible);//найти элемент по тексту и проверить видимость, кликнуть
+                .shouldBe(visible);//найти элемент по тексту и проверить видимость
         };
-//
-//        @И("открыла {string}")
-//        public void openedSignInWindow(String login) throws InvocationTargetException, IllegalAccessException {
-//                System.out.println("Открываем окно авторизации");
-//                mainPage.getElementByName(login).click();
-//        };
 
-        @Затем("авторизовалась с {string} и {string}")
-        public void signedIn(String login, String password) {
+        @Затем("на {string} авторизовалась с {string} и {string}") //тут authPage = "страница авторизации", это название связано с адресом в классе AuthorizationWindow
+        public void signedIn(String authPage, String login, String password) throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
                 System.out.println("Авторизуемся с логином \"" + login + "\" и паролем \"" + password + "\".");
-                $(byId("id_username")).sendKeys(login);//ввести логин
-                $(byId("id_password")).sendKeys(password);//ввести пароль
-                $(byXpath("//*[@id=\"modal-mount\"]/div/div/form/div[2]/button")).click(); // кликнуть на кнопку Войти
+                AbstractPage.getPageByTitle(authPage).getElementByName("логин")
+                        .shouldBe(visible).sendKeys(login);// проверить видимость поля для ввода логина, ввести логин
+                AbstractPage.getPageByTitle(authPage).getElementByName("пароль")
+                        .shouldBe(visible).sendKeys(password); // проверить видимость поля для ввода пароля, ввести пароль
+                AbstractPage.getPageByTitle(authPage).getElementByName("Войти")
+                        .shouldBe(visible).click(); // кликнуть на кнопку Войти
         };
-        @Тогда("отобразился аватар")
-        public void avatarIsPresent() {
+        @Тогда("на {string} отобразился аватар")//тут mainPage = "главная страница", это название связано с адресом в классе MainPage
+        public void avatarIsPresent(String mainPage) throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
                 System.out.println("Проверяем, отобразился ли аватар");
-                $(byClassName("user-avatar")).shouldBe(visible);//проверить авторизацию-отображается ли аватар
+                AbstractPage.getPageByTitle(mainPage).getElementByName("аватар").shouldBe(visible);
         };
-        @И("я открыла тему без опроса")
-        public void openedTopic() throws InterruptedException {
-                System.out.println("Открываем тему");
-                ElementsCollection collection = $$(By.xpath("//a[contains(@class, 'item-title thread-title') and not(contains(text(), 'Опрос'))]"));//найти вcе элементы определенного класса без текста "Опрос"
-                collection.get((int) (collection.size() * Math.random())).click();//взять элемент (тема) под случайным номером в коллекции
-                //*[@id="page-mount"]/div/div[2]/div[2]/ul/li[8]/div[2]/div[1]/div/div[2]/div/div[1]/span[1]/span[2]
-                Thread.sleep(3000);
+
+        @И("на {string} я открыла {string}")//тут mainPage = "главная страница", topicsTab - "вкладка Темы"
+        public void openedTopicsTab(String mainPage, String topicsTab) throws InterruptedException, IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+                System.out.println("Открываем вкладку \"Темы\"");
+                AbstractPage.getPageByTitle(mainPage).getElementByName(topicsTab).click();//открыть вкладку Темы
+                //Thread.sleep(3000);
+        };
+        @И("на {string} открыла {string}")//тут mainPage = "главная страница"
+        public void openedTopic(String mainPage, String randomTopic) throws InterruptedException, IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+                System.out.println("Открываем случайную тему");
+                SelenideElement randomTopicElement = AbstractPage.getPageByTitle(mainPage).getElementByName(randomTopic);//взять элемент (тема) под случайным номером в коллекции
+                topicName = randomTopicElement.getText();//получаем текст-название случайно выбранной темы
+
+                System.out.println("Выбрана тема: " + topicName);//выводим название случайно выбранной темы
+                randomTopicElement.click();//кликнуть на случайно выбранный элемент(тема)
+                topicUrl = url();//получаем URL страницы с выбранной темой
+                assertEquals(topicName, AbstractPage.getPageByTitle(mainPage).getElementByName("выбранная тема").getText());//проверим, открылась ли тема с тем самым полученным текстом в названии
+                //AbstractPage.getUrl(topicUrl);
+                //Thread.sleep(3000);
         };
         @И("написала сообщение")
         public void addedMessage() throws InterruptedException {
-                System.out.println("Пишем туда рандомно выбранную из HashMap цитату Оскара Уайльда");
+                System.out.println("Пишем туда рандомно выбранную из массива цитату Оскара Уайльда");
+
                 $(byCssSelector("[class=\"btn btn-primary btn-block btn-outline\"]")).click();//кликнуть на кнопку "Ответить" сверху
-                HashMap<Integer, String> WildeQuotes = new HashMap();//map with messages (O.Wilde quotes)
-                WildeQuotes.put(1, "Be yourself; everyone else is already taken. (O.Wilde)");    //we put some values here and below
-                WildeQuotes.put(2, "We are all in the gutter, but some of us are looking at the stars. (O.Wilde)");
-                WildeQuotes.put(3, "To live is the rarest thing in the world. Most people exist, that is all. (O.Wilde)");
-                WildeQuotes.put(4, "If one cannot enjoy reading a book over and over again, there is no use in reading it at all. (O.Wilde)");
-                WildeQuotes.put(5, "The truth is rarely pure and never simple. (O.Wilde)");
-                WildeQuotes.put(6, "Never love anyone who treats you like you're ordinary. (O.Wilde)");
-                WildeQuotes.put(7, "A good friend will always stab you in the front. (O.Wilde)");
-                Random generator = new Random(); //это для получения случайного значения из map WildeQuotes
-                Object[] values = WildeQuotes.values().toArray(); //это для получения случайного значения из map WildeQuotes
-                randomMessage = (String) values[generator.nextInt(values.length)]; //это для получения случайного значения из map WildeQuotes
+
+                randomMessage = pages.TopicMessage.PickMessage();//используем метод для выбора случайн.значения (метод находится во вспомогательном классе TopicMessage)
                 System.out.println(randomMessage);
-                Thread.sleep(4000);
+                //Thread.sleep(4000);
                 $(byId("editor-textarea")).shouldBe(visible).sendKeys(randomMessage);//проверить видимость текстового поля и добавить сообщение
-                Thread.sleep(3000);
+                //Thread.sleep(3000);
                 $(byText("Отправить ответ")).shouldBe(visible);//найти кнопку "Отправить ответ", проверить видимость
                 $(byText("Отправить ответ")).click();//найти кнопку "Отправить ответ" и кликнуть
         };
@@ -95,18 +106,66 @@ public class MyStepdefs {
                 System.out.println("Проверяем, отображается ли в теме добавленное сообщение");
                 $(byText(randomMessage)).shouldBe(visible);//проверить видимость отправленного сообщения на странице
         };
-        @Затем("я открыла вкладку Темы")
-        public void openedTab() {
+        @Затем("я открыла {string}")
+        public void openedTab(String topicsTab) {
                 System.out.println("Открываем вкладку с темами");
                 //найти вкладку Темы и кликнуть
+                //AbstractPage.getElementByName(topicsTab).click();
+                //AbstractPage.getPageByTitle(mainPage).getElementByName(topicsTab).
                 $(By.xpath("//ul[@class = 'nav navbar-nav']//a[contains(text(), 'Темы')]")).scrollTo().shouldBe(visible).click();
         };
         @И("повторила добавление сообщения")
-        public void addedMessageAgain() throws InterruptedException {
+        public void addedMessageAgain() throws InterruptedException, ClassNotFoundException, InvocationTargetException, InstantiationException, IllegalAccessException {
                 System.out.println("Повторяем шаги с добавлением темы");
-                openedTopic();
+                openedTopic("главная страница", "случайная тема");
                 addedMessage();
                 messageIsSent();
-                openedTab();
+                openedTab("вкладка Темы");
         };
+
+        //И на "главная страница" нажала на элемент "неактивна" случайной темы
+        @И("на {string} нажала на элемент {string} случайной темы")//тут mainPage = "главная страница"
+        public void clickInactive(String mainPage, String inactive) throws InterruptedException, IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+                System.out.println("Нажимаем на Неактивна");
+                SelenideElement randomInactiveElement = AbstractPage.getPageByTitle(mainPage).getElementByName(inactive);//взять элемент (тема) под случайным номером в коллекции
+                //String InactiveTopic = randomInactiveElement.getText();//получаем текст-название случайно выбранной темы
+
+                //System.out.println("Выбрана тема: " + InactiveTopic);//выводим название случайно выбранной темы
+                randomInactiveElement.scrollTo().click();//кликнуть на случайно выбранный элемент Неактивна
+                System.out.println("текст род элемента: " + randomInactiveElement.getWrappedElement().getText());//?
+                Thread.sleep(3000);
+        };
+
+        @Затем("на {string} в выпадающем списке выбрала {string}")
+        public void clickSubscribe(String mainPage, String subscribe) throws InterruptedException, IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+                System.out.println("В выпадающем списке выбираем Подписаться");
+                AbstractPage.getPageByTitle(mainPage).getElementByName(subscribe).click();//кликнуть на Подписаться
+                Thread.sleep(3000);
+        };
+
+        @И("на {string} убедилась, что подписка {string}")
+        public void isActive(String mainPage, String active) throws InterruptedException, IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+                System.out.println("проверяем, что подписка Активна");
+                AbstractPage.getPageByTitle(mainPage).getElementByName(active).shouldBe(visible);
+                Thread.sleep(3000);
+        };
+
+        @И("на {string} так же подписалась на другую тему")
+        public void repeatSubscribe(String mainPage) throws InterruptedException, IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+                System.out.println("подписываемся еще на одну тему");
+                clickInactive(mainPage, "неактивна");
+                clickSubscribe(mainPage, "подписаться");
+                isActive(mainPage, "активна");
+                Thread.sleep(3000);
+        };
+        @Затем("на {string} открыла страницу {string}")
+        public void openSubscriptions(String mainPage) throws InterruptedException, IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+                System.out.println("подписываемся еще на одну тему");
+                clickInactive(mainPage, "неактивна");
+                clickSubscribe(mainPage, "подписаться");
+                isActive(mainPage, "активна");
+                Thread.sleep(3000);
+        };
+        //     Затем на "главная страница" открыла вкладку "подписки"
+
 }

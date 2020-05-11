@@ -18,12 +18,13 @@ public class Hooks {
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--disable-save-password-bubble");
         WebDriver driver = new ChromeDriver(options);
+        WebDriverRunner.setWebDriver(driver);
+        System.out.println("Начало теста");
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         driver.manage().timeouts().pageLoadTimeout(5, TimeUnit.SECONDS);
         driver.manage().timeouts().setScriptTimeout(5, TimeUnit.SECONDS);
-        WebDriverRunner.setWebDriver(driver);
-        System.out.println("Начало теста");
+
     }
     @After
     public void after(){

@@ -59,7 +59,8 @@ public class AppTest {
      * then we click to open the topic
      */
     public void openTopic() {
-        ElementsCollection collection = $$(By.xpath("//li[@class='list-group-item thread-read']//a[@class='item-title thread-title']")).excludeWith(text("assessment"));
+        //ElementsCollection collection = $$(By.xpath("//li[@class='list-group-item thread-read']//a[@class='item-title thread-title']")).excludeWith(text("assessment"));
+        ElementsCollection collection = $$(By.xpath("//a[contains(@class, 'item-title thread-title') and not(contains(text(), 'Опрос'))]"));
         collection.get((int) (collection.size() * Math.random())).click();//взять элемент (тема) под случайным номером в коллекции
     }
 
