@@ -31,9 +31,19 @@ public class MyStepdefs {
 
         SelenideElement randomInactiveElement; //для кнопки Неактивна
 
-        @Element("Ответить")
+        @Element("Ответить") //кнопка Ответить на странице случайно выбранной темы - не получилось использовать Page
         public WebElement addMessage() {
                 return $(byCssSelector("[class=\"btn btn-primary btn-block btn-outline\"]"));//найти элемент Темы по xpath
+        }
+
+        @Element("отписаться") //отписаться на вкладке Подписки- не получилось использовать Page
+        public SelenideElement unsubscribe() {
+                return $(By.xpath("//div[@class='col-sm-2 col-md-2 hidden-xs']//div[@class='btn-group open']//button[@class='btn-link' and text()='Отписаться ']"));
+        }
+
+        @Element("активна") //активна на вкладке Подписки- не получилось использовать Page
+        public SelenideElement active() {
+                return $(By.xpath("//div[@class='col-sm-2 col-md-2 hidden-xs']//div[@class='btn-group']//button[@class='btn btn-default btn-icon btn-block btn-subscribe btn-subscribe-half dropdown-toggle']"));
         }
 
 //адреса элементов описаны в классе AuthorizationWindow (элементы окна авторизации: поля для ввода логина и пароля и т.д.)
@@ -94,7 +104,6 @@ public class MyStepdefs {
                 randomTopicElement.shouldBe(visible).click();//кликнуть на случайно выбранный элемент(тема)
                 topicUrl = url();//получаем URL страницы с выбранной темой
               //  assertEquals(topicName, AbstractPage.getPageByTitle(mainPage).getElementByName("выбранная тема").getText());//проверим, открылась ли тема с тем самым полученным текстом в названии
-                //Thread.sleep(3000);
         }
 
         //И написала сообщение
@@ -139,7 +148,7 @@ public class MyStepdefs {
 
         //И на "главная страница" нажала на элемент "неактивна" случайной темы
         @И("на {string} нажала на элемент {string} случайной темы")//тут mainPage = "главная страница"
-        public void clickInactive(String mainPage, String inactive) throws InterruptedException, IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+        public void clickInactive(String mainPage, String inactive) throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
                 System.out.println("Нажимаем на Неактивна");
                 randomInactiveElement = AbstractPage.getPageByTitle(mainPage).getElementByName(inactive).shouldBe(visible);//взять элемент (тема) под случайным номером в коллекции
                 String InactiveTopic = randomInactiveElement.getText();//получаем текст-название случайно выбранной темы
@@ -147,7 +156,6 @@ public class MyStepdefs {
                 System.out.println("Выбрана тема: " + InactiveTopic);//выводим название случайно выбранной темы
                 randomInactiveElement.shouldBe(visible).scrollTo().click();//кликнуть на случайно выбранный элемент Неактивна
                 System.out.println("текст род элемента: " + randomInactiveElement.getWrappedElement().getText());//?
-                //Thread.sleep(3000);
         }
 
         //Затем на "главная страница" в выпадающем списке выбрала "подписаться"
@@ -184,23 +192,34 @@ public class MyStepdefs {
         }
 
         // И на "вкладка подписки" убедилась, что подписки "активна"
-        @И("на {string} убедилась, что подписки {string}")
-        public void checkSubscription(String subscriptionsTab, String active) throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
-                AbstractPage.getPageByTitle(subscriptionsTab).getElementByName(active).shouldBe(visible);
-                //AbstractPage.getPageByTitle(subscriptionsTab).getElementByName("сообщение об отсутствии подписок").shouldNotBe(visible);
+//        @И("на {string} убедилась, что подписки {string}")
+//        public void checkSubscription(String subscriptionsTab, String active) throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+//                //AbstractPage.getPageByTitle(subscriptionsTab).getElementByName(active).shouldBe(visible);
+//                $(By.xpath("//li[@class='list-group-item empty-message']")).shouldNotBe(visible);
+//        }
+
+        //И убедилась, что хотя бы одна подписка активна
+        @И("убедилась, что хотя бы одна подписка активна")
+        public void checkSubscription() {
+                //AbstractPage.getPageByTitle(subscriptionsTab).getElementByName(active).shouldBe(visible);
+                $(By.xpath("//li[@class='list-group-item empty-message']")).shouldNotBe(visible);
         }
 
         //Затем на "вкладка подписки" нажала "отписаться" от всех "активна" и увидела "сообщение об отсутствии подписок"
-        @Затем("на {string} нажала {string} от всех {string} и увидела {string}")
-        public void unsubscribeALL(String subscriptionsTab, String unsubscribe, String active, String noSubsMessage) throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
-                Boolean noSubs = false;
+//        @Затем("на {string} нажала {string} от всех {string} и увидела {string}")
+//        public void unsubscribeALL(String subscriptionsTab, String unsubscribe, String active, String noSubsMessage) throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+//                while(AbstractPage.getPageByTitle(subscriptionsTab).getElementByName(active)) {
+//                        AbstractPage.getPageByTitle(subscriptionsTab).getElementByName(active).shouldBe(visible).click();
+//                        AbstractPage.getPageByTitle(subscriptionsTab).getElementByName(unsubscribe).shouldBe(visible).click();
+//                }
+//        }
+        @Затем("отписалась от всех подписок, все подписки неактивны")
+        public void unsubscribeALL()  {
 //
-                if (AbstractPage.getPageByTitle(subscriptionsTab).getElementByName(noSubsMessage).isDisplayed()) {
-                        noSubs = true;
+                while($(By.xpath("//div[@class='col-sm-2 col-md-2 hidden-xs']//div[@class='btn-group']//button[@class='btn btn-default btn-icon btn-block btn-subscribe btn-subscribe-half dropdown-toggle']")).isDisplayed()) { //while Активна is displayed
+                        $(By.xpath("//div[@class='col-sm-2 col-md-2 hidden-xs']//div[@class='btn-group']//button[@class='btn btn-default btn-icon btn-block btn-subscribe btn-subscribe-half dropdown-toggle']")).shouldBe(visible).click();
+                        $(By.xpath("//div[@class='col-sm-2 col-md-2 hidden-xs']//div[@class='btn-group open']//button[@class='btn-link' and text()='Отписаться ']")).shouldBe(visible).click();
                 }
-                while(!noSubs) {
-                        AbstractPage.getPageByTitle(subscriptionsTab).getElementByName(active).shouldBe(visible).click();
-                        AbstractPage.getPageByTitle(subscriptionsTab).getElementByName(unsubscribe).shouldBe(visible).click();
-                }
+                System.out.println("Мы отписались ото всех тем");
         }
 }
