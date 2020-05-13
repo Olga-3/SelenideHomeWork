@@ -7,6 +7,7 @@ import cucumber.api.java.ru.Пусть;
 import cucumber.api.java.ru.Тогда;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+
 import pages.AbstractPage;
 import pages.annotations.Element;
 
@@ -27,6 +28,8 @@ public class MyStepdefs {
         private String randomMessage;//этой переменной присваивается рандомно выбранное из array значение
         private String topicName; //тут будет сохранен текст-название случайно выбранной темы для теста 1
        // public String topicUrl;
+
+        SelenideElement randomInactiveElement; //для кнопки Неактивна
 
         @Element("Ответить")
         public WebElement addMessage() {
@@ -90,7 +93,7 @@ public class MyStepdefs {
                 System.out.println("Выбрана тема: " + topicName);//выводим название случайно выбранной темы
                 randomTopicElement.shouldBe(visible).click();//кликнуть на случайно выбранный элемент(тема)
                 topicUrl = url();//получаем URL страницы с выбранной темой
-                assertEquals(topicName, AbstractPage.getPageByTitle(mainPage).getElementByName("выбранная тема").getText());//проверим, открылась ли тема с тем самым полученным текстом в названии
+              //  assertEquals(topicName, AbstractPage.getPageByTitle(mainPage).getElementByName("выбранная тема").getText());//проверим, открылась ли тема с тем самым полученным текстом в названии
                 //Thread.sleep(3000);
         }
 
@@ -116,12 +119,10 @@ public class MyStepdefs {
                 $(byText(randomMessage)).shouldBe(visible);//проверить видимость отправленного сообщения на странице
         }
 
-        //
         @Затем("я открыла {string}")
         public void openedTab(String topicsTab) {
                 System.out.println("Открываем вкладку с темами");
                 //найти вкладку Темы и кликнуть
-                //AbstractPage.getElementByName(topicsTab).shouldBe(visible).click();
                 //AbstractPage.getPageByTitle(mainPage).getElementByName(topicsTab).shouldBe(visible).click();
                 $(By.xpath("//ul[@class = 'nav navbar-nav']//a[contains(text(), 'Темы')]")).scrollTo().shouldBe(visible).click();
         }
@@ -140,29 +141,30 @@ public class MyStepdefs {
         @И("на {string} нажала на элемент {string} случайной темы")//тут mainPage = "главная страница"
         public void clickInactive(String mainPage, String inactive) throws InterruptedException, IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
                 System.out.println("Нажимаем на Неактивна");
-                SelenideElement randomInactiveElement = AbstractPage.getPageByTitle(mainPage).getElementByName(inactive).shouldBe(visible);//взять элемент (тема) под случайным номером в коллекции
-                //String InactiveTopic = randomInactiveElement.getText();//получаем текст-название случайно выбранной темы
+                randomInactiveElement = AbstractPage.getPageByTitle(mainPage).getElementByName(inactive).shouldBe(visible);//взять элемент (тема) под случайным номером в коллекции
+                String InactiveTopic = randomInactiveElement.getText();//получаем текст-название случайно выбранной темы
 
-                //System.out.println("Выбрана тема: " + InactiveTopic);//выводим название случайно выбранной темы
+                System.out.println("Выбрана тема: " + InactiveTopic);//выводим название случайно выбранной темы
                 randomInactiveElement.shouldBe(visible).scrollTo().click();//кликнуть на случайно выбранный элемент Неактивна
                 System.out.println("текст род элемента: " + randomInactiveElement.getWrappedElement().getText());//?
-                Thread.sleep(3000);
+                //Thread.sleep(3000);
         }
 
         //Затем на "главная страница" в выпадающем списке выбрала "подписаться"
         @Затем("на {string} в выпадающем списке выбрала {string}")
         public void clickSubscribe(String mainPage, String subscribe) throws InterruptedException, IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
                 System.out.println("В выпадающем списке выбираем Подписаться");
-                AbstractPage.getPageByTitle(mainPage).getElementByName(subscribe).shouldBe(visible).click();//кликнуть на Подписаться
+                AbstractPage.getPageByTitle(mainPage).getElementByName(subscribe).shouldBe(visible).click();
                 Thread.sleep(3000);
+                //Thread.sleep(3000);
         }
 
         //И на "главная страница" убедилась, что подписка "активна"
         @И("на {string} убедилась, что подписка {string}")
-        public void isActive(String mainPage, String active) throws InterruptedException, IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+        public void isActive(String mainPage, String active) throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
                 System.out.println("проверяем, что подписка Активна");
                 AbstractPage.getPageByTitle(mainPage).getElementByName(active).shouldBe(visible);
-                Thread.sleep(3000);
+                //Thread.sleep(3000);
         }
 
         //И на "главная страница" так же подписалась на другую тему
@@ -172,14 +174,33 @@ public class MyStepdefs {
                 clickInactive(mainPage, "неактивна");
                 clickSubscribe(mainPage, "подписаться");
                 isActive(mainPage, "активна");
-                Thread.sleep(3000);
+                //Thread.sleep(3000);
         }
 
-        //Затем на "главная страница" открыла "вкладка подписки"
+        //Затем на "главная страница" открыла "подписки"
         @Затем("на {string} открыла страницу {string}")
-        public void openSubscriptions(String mainPage, String subscriptionsTab) throws InterruptedException, IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
-                AbstractPage.getPageByTitle(mainPage).getElementByName(subscriptionsTab).shouldBe(visible).click();
+        public void openSubscriptions(String mainPage, String subscriptions) throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+                AbstractPage.getPageByTitle(mainPage).getElementByName(subscriptions).shouldBe(visible).click();
         }
 
+        // И на "вкладка подписки" убедилась, что подписки "активна"
+        @И("на {string} убедилась, что подписки {string}")
+        public void checkSubscription(String subscriptionsTab, String active) throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+                AbstractPage.getPageByTitle(subscriptionsTab).getElementByName(active).shouldBe(visible);
+                //AbstractPage.getPageByTitle(subscriptionsTab).getElementByName("сообщение об отсутствии подписок").shouldNotBe(visible);
+        }
 
+        //Затем на "вкладка подписки" нажала "отписаться" от всех "активна" и увидела "сообщение об отсутствии подписок"
+        @Затем("на {string} нажала {string} от всех {string} и увидела {string}")
+        public void unsubscribeALL(String subscriptionsTab, String unsubscribe, String active, String noSubsMessage) throws IllegalAccessException, InstantiationException, ClassNotFoundException, InvocationTargetException {
+                Boolean noSubs = false;
+//
+                if (AbstractPage.getPageByTitle(subscriptionsTab).getElementByName(noSubsMessage).isDisplayed()) {
+                        noSubs = true;
+                }
+                while(!noSubs) {
+                        AbstractPage.getPageByTitle(subscriptionsTab).getElementByName(active).shouldBe(visible).click();
+                        AbstractPage.getPageByTitle(subscriptionsTab).getElementByName(unsubscribe).shouldBe(visible).click();
+                }
+        }
 }

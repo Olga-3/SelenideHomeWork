@@ -14,10 +14,20 @@ import static com.codeborne.selenide.Selenide.$$;
 
 //тут адреса всех нужных элементов главной страницы (сюда ссылаются шаги в MyStepdefs)
 
-@Page(title = "подписки", url = "https://dev.n7lanit.ru/subscribed/")
+@Page(title = "вкладка подписки", url = "https://dev.n7lanit.ru/subscribed/")
 public class SubscriptionsTab {
-//    @Element("вкладка Темы")
-//    public WebElement getTopicsTab() {
-//        return $(By.xpath("//ul[@class = 'nav navbar-nav']//a[contains(text(), 'Темы')]"));//найти элемент Темы по xpath
-//    }
+
+    @Element("активна")
+    public SelenideElement active() {
+        return $(By.xpath("//div[@class='col-sm-2 col-md-2 hidden-xs']//div[@class='btn-group']//button[@class='btn btn-default btn-icon btn-block btn-subscribe btn-subscribe-half dropdown-toggle']"));
+    }
+    @Element("сообщение об отсутствии подписок")
+    public SelenideElement noSubsMessage() {
+        return $(By.xpath("//li[@class='list-group-item empty-message']"));
+    }
+
+    @Element("отписаться")
+    public SelenideElement unsubscribe() {
+        return $(By.xpath("//div[@class='col-sm-2 col-md-2 hidden-xs']//div[@class='btn-group open']//button[@class='btn-link' and text()='Отписаться']"));
+    }
 }

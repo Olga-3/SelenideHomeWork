@@ -5,7 +5,11 @@ import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.Selectors;
 import com.codeborne.selenide.SelenideElement;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import pages.annotations.Element;
 import pages.annotations.Page;
 
@@ -39,11 +43,11 @@ public class MainPage extends AbstractPage {
         ElementsCollection collection = $$(By.xpath("//a[contains(@class, 'item-title thread-title') and not(contains(text(), 'Опрос'))]"));//найти вcе элементы определенного класса без текста "Опрос"-но это
         return collection.get((int) (collection.size() * Math.random()));//взять элемент (тема) под случайным номером в коллекции
     }
-
-    @Element("выбранная тема")
-    public SelenideElement chosenTopic() {
-        return  $(By.xpath("//*[@id=\"page-mount\"]/div/div[1]/div/div[2]/h1"));
-    }
+//
+//    @Element("выбранная тема")
+//    public SelenideElement chosenTopic() {
+//        return  $(By.xpath("//*[@id=\"page-mount\"]/div/div[1]/div/div[2]/h1"));
+//    }
 
     @Element("неактивна")
     public SelenideElement InactiveSubscription() throws InterruptedException {
@@ -53,18 +57,18 @@ public class MainPage extends AbstractPage {
     }
     @Element("подписаться")
     public SelenideElement subscribe() {
-        return $(By.xpath("//*[text()='Подписаться']"));//работает,вроде бы, но через раз
-        //return $(By.xpath("//li[@class='btn-link')][text()='Подписаться']"));//вообще не работает, вроде бы
-       // return $(By.partialLinkText("Подписать"));//не работает
-    }
-    @Element("активна")
-    public SelenideElement active() {
-        return $(By.xpath("//*[text()='Активна']"));
+        return $(By.xpath("//div[@class='col-sm-2 col-md-2 hidden-xs']//div[@class='btn-group open']//button[@class='btn-link' and text()='Подписаться']"));
     }
 
-    @Element("вкладка подписки")
-    public SelenideElement subscriptionsTab() {
-        return $(By.xpath(""));
+    @Element("активна")
+    public SelenideElement active() {
+        return $(By.xpath("//div[@class='col-sm-2 col-md-2 hidden-xs']//div[@class='btn-group']//button[@class='btn btn-default btn-icon btn-block btn-subscribe btn-subscribe-half dropdown-toggle']"));
+    }
+
+    @Element("подписки")
+    public SelenideElement subscriptions() {
+        return $(By.xpath("//a[@href='/subscribed/']"));
+        //return $(By.linkText("Подписки"));
     }
 
 
